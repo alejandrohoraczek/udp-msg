@@ -19,8 +19,6 @@ const receivedMsg = 'RPF241207150026-3460180-05847823018156300F400' //* recibimo
 
 //INFO función que extrae el mensaje UDP y devuelve un objeto con toda la información detallada
 function deconstructMessage(receivedMsg) {
-  let data //* variable donde guardaremos la información
-
   const queryType = receivedMsg.slice(0, 3) //* extraemos el tipo de mensaje
 
   const message = receivedMsg.slice(3) //* extraemos el mensaje completo
@@ -38,8 +36,7 @@ function deconstructMessage(receivedMsg) {
   const reportEvent = message.slice(config.RPF.reportEvent.start, config.RPF.reportEvent.end)
 
   //* Guardamos la información y la devolvemos 
-  
-  data = {
+  let data = {
     positionDate: {
       day: positionDate[0] + positionDate[1],
       month: positionDate[2] + positionDate[3],
@@ -73,4 +70,4 @@ function deconstructMessage(receivedMsg) {
   return data
 }
 
-console.log(deconstructMessage(receivedMsg))
+console.log(deconstructMessage(receivedMsg))  
