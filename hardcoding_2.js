@@ -61,8 +61,10 @@ function deconstructMessage(receivedMsg) {
   })
 
   //INFO borramos las propiedades de fecha y hora que obtuvimos originalmente del mensaje para dejar únicamente el timestamp
+  //INFO tambien borramos el defaultSize que se nos crea en el forEach
   delete data.positionDate
   delete data.positionTime
+  delete data.defaultSize
 
   //INFO freezado para mejorar el rendimiento
   Object.freeze(data)
