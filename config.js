@@ -13,7 +13,7 @@ const config = {
       age: { lenght: 2, start: 36, end: 38},
       reportState: { lenght: 2, start: 38, end: 40},
       reportEvent: { lenght: 2, start: 40, end: 42},
-      defaultSize: 45,
+      msgChars: 69,
       },
       RPG: {
       positionDate: { lenght: 6, start: 0, end:6 },
