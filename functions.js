@@ -3,6 +3,7 @@ const { Buffer } = require('node:buffer') //! para calcular el tamaño en bytes 
 
 const receivedMsg =
   '>RPF151222180559-3436968-058760820002342008048;ID=6838;#IP0:A17D;*6A<' //* recibimos el mensaje del dispositivo
+const theOtherMsg = `+RESP:GTFRI,500203,135790246811220,,,00,2,1,4.3,92,70.0,121.354335,31.222073,20090214013254,0460,0000,18d8,6141,00,0,4.3,92,70.0,121.354335,31.222073,20090101000000,0460,0000,18d8,6141,00,2000.0,12345:12:34,,,80,210100,,,,20090214093254,11F0$`
 
 // función que extrae el mensaje UDP y devuelve un objeto con toda la información detallada
 function deconstructMessage(buffer) {
@@ -13,17 +14,19 @@ function deconstructMessage(buffer) {
   const eventChecksum = msg.slice(-3, -1) // extramos el checksum del mensaje
   const calculatedCheckSum = GetCheckSum(msg) // nuestro cálculo del checksum
   const id = msg.split(';')[1].slice(3) // extramos el ID del equipo
-  const destination = { // extramos el destino y la secuencia del mensaje
+  const destination = {
+    // extramos el destino y la secuencia del mensaje
     identifier: msg.split(';')[2].slice(0, 4),
     sequence: parseInt(msg.split(';')[2].slice(5, 9), 16),
     // sequence: msg.split(';')[2].slice(5, 9),
   }
   const descriptor = Object.getOwnPropertyDescriptor(config, eventType) //descriptor nos permite obtener propiedades del mensaje que llega (RPF, RPG, etc...)
   const msgSize = Buffer.byteLength(msg, 'utf-8') // obtenemos el tamaño del mensaje para compararlo con el tamaño por defecto según el tipo de mensaje
-  
+
   // manejo de errores
   try {
-    if (!descriptor) // ¿está el tipo de mensaje en la variable config?
+    if (!descriptor)
+      // ¿está el tipo de mensaje en la variable config?
       throw new Error('¡No existe ese tipo de mensaje!')
     //? le pregunto al equipo "che, ¿me pasaste mal el mensaje?" con una query?
 
@@ -42,13 +45,16 @@ function deconstructMessage(buffer) {
 
   const eventProperties = Object.keys(descriptor.value) // extraigo las propiedades que me comunica el evento
 
-  eventProperties.forEach((key) => { // por aca propiedad voy a:
+  eventProperties.forEach((key) => {
+    // por aca propiedad voy a:
 
-    const getValues = eventMessage.slice( // 1) determinar el valor de esa propiedad
+    const getValues = eventMessage.slice(
+      // 1) determinar el valor de esa propiedad
       descriptor.value[key].start,
       descriptor.value[key].end
     )
-    Object.defineProperty(data, key, { // 2) definir esas propiedades en el objeto `data`
+    Object.defineProperty(data, key, {
+      // 2) definir esas propiedades en el objeto `data`
       value: getValues,
       writable: true, //necesario para poder escribir sobre la propiedad
       enumerable: true, //necesario para que funcione dentro del bucle
@@ -90,7 +96,7 @@ function deconstructMessage(buffer) {
       writable: true,
       enumerable: true,
       configurable: true,
-    }
+    },
   })
 
   delete data.positionDate //borramos todo lo que no necesitamos
@@ -115,15 +121,16 @@ function GetCheckSum(msg) {
   return checksum.toString(16).toUpperCase()
 }
 
-function parseCoordinates(coor){
+function parseCoordinates(coor) {
   const coordinates = {
     int: coor.slice(0, -5), //extraemos la parte entera
-    decimals: coor.slice(-5) //y la decimal 
+    decimals: coor.slice(-5), //y la decimal
   }
   return +`${coordinates.int}.${coordinates.decimals}` //lo devolvemos como número
 }
 
-function parseBodyObject(obj){ //función que devuelve el objecto parseado para enviar a la API
+function parseBodyObject(obj) {
+  //función que devuelve el objecto parseado para enviar a la API
   return {
     id: obj.deviceID,
     lat: parseCoordinates(obj.positionLat),
@@ -143,5 +150,9 @@ function parseBodyObject(obj){ //función que devuelve el objecto parseado para 
 parseCoordinates('-13076082')
 parseCoordinates('-3436968')
 
-module.exports = { deconstructMessage, GetCheckSum, parseCoordinates, parseBodyObject }
-
+module.exports = {
+  deconstructMessage,
+  GetCheckSum,
+  parseCoordinates,
+  parseBodyObject,
+}
